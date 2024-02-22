@@ -1,116 +1,100 @@
 package com.example.myapplication
-
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.provider.Settings
+import android.os.Bundle
 import android.widget.Button
 import android.widget.CheckBox
-import android.widget.DatePicker
 import android.widget.EditText
-import android.widget.TimePicker
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var messageEditText: EditText
-    private lateinit var selectDateTimeButton: Button
-    private lateinit var scheduleButton: Button
-    private lateinit var autoTurnOnDataCheckbox: CheckBox
 
-    private var selectedYear = 0
-    private var selectedMonth = 0
-    private var selectedDay = 0
-    private var selectedHour = 0
-    private var selectedMinute = 0
+    private lateinit var editTextMessage: EditText
+    private lateinit var editTextPhoneNumber: EditText
+    private lateinit var editTextDateTime: EditText
+    private lateinit var checkBoxMobileData: CheckBox
+    private lateinit var buttonSendNow: Button
+    private lateinit var buttonSchedule: Button
+    private val calendar: Calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        messageEditText = findViewById(R.id.messageEditText)
-        selectDateTimeButton = findViewById(R.id.selectDateTimeButton)
-        scheduleButton = findViewById(R.id.scheduleButton)
-        autoTurnOnDataCheckbox = findViewById(R.id.autoTurnOnDataCheckbox)
+        // Initialize UI elements
+        editTextMessage = findViewById(R.id.editTextMessage)
+        editTextPhoneNumber = findViewById(R.id.editTextPhoneNumber)
+        editTextDateTime = findViewById(R.id.editTextDateTime)
+        checkBoxMobileData = findViewById(R.id.checkBoxMobileData)
+        buttonSendNow = findViewById(R.id.buttonSendNow)
+        buttonSchedule = findViewById(R.id.buttonSchedule)
 
-        selectDateTimeButton.setOnClickListener {
+        // Set click listeners
+        editTextDateTime.setOnClickListener {
             showDateTimePicker()
         }
 
-        scheduleButton.setOnClickListener {
-            scheduleMessage()
+        buttonSendNow.setOnClickListener {
+            sendMessage(editTextMessage.text.toString(), editTextPhoneNumber.text.toString())
         }
 
-        autoTurnOnDataCheckbox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                if (!isMobileDataEnabled()) {
-                    requestTurnOnMobileData()
-                }
-            }
+        buttonSchedule.setOnClickListener {
+            scheduleMessage(editTextMessage.text.toString(), editTextPhoneNumber.text.toString())
         }
-    }
-
-    private fun isMobileDataEnabled(): Boolean {
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val info = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)
-        return info != null && info.isConnected
-    }
-
-    private fun requestTurnOnMobileData() {
-        val intent = Intent(Settings.ACTION_DATA_USAGE_SETTINGS)
-        startActivity(intent)
     }
 
     private fun showDateTimePicker() {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(
+        val datePicker = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
-                selectedYear = year
-                selectedMonth = monthOfYear
-                selectedDay = dayOfMonth
+            { _, year, month, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, month)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 showTimePicker()
             },
-            year,
-            month,
-            day
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
         )
-        datePickerDialog.show()
+        datePicker.datePicker.minDate = System.currentTimeMillis()
+        datePicker.show()
     }
 
     private fun showTimePicker() {
-        val calendar = Calendar.getInstance()
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        val minute = calendar.get(Calendar.MINUTE)
-
-        val timePickerDialog = TimePickerDialog(
+        val timePicker = TimePickerDialog(
             this,
-            TimePickerDialog.OnTimeSetListener { _, hourOfDay, minute ->
-                selectedHour = hourOfDay
-                selectedMinute = minute
+            { _, hourOfDay, minute ->
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay)
+                calendar.set(Calendar.MINUTE, minute)
+                updateDateTime()
             },
-            hour,
-            minute,
-            true
+            calendar.get(Calendar.HOUR_OF_DAY),
+            calendar.get(Calendar.MINUTE),
+            false
         )
-        timePickerDialog.show()
+        timePicker.show()
     }
 
-    private fun scheduleMessage() {
-        val message = messageEditText.text.toString()
-        val calendar = Calendar.getInstance()
-        calendar.set(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute)
-        val scheduledTime = calendar.timeInMillis
+    private fun updateDateTime() {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+        editTextDateTime.setText(dateFormat.format(calendar.time))
+    }
 
-        // Implement logic to schedule the message using AlarmManager or WorkManager
-        // For simplicity, let's just print the scheduled time
-        println("Message scheduled to be sent at: $scheduledTime")
+    private fun sendMessage(message: String, phoneNumber: String) {
+        val sendIntent = Intent()
+        sendIntent.action = Intent.ACTION_SEND
+        sendIntent.putExtra(Intent.EXTRA_TEXT, message)
+        sendIntent.type = "text/plain"
+        sendIntent.setPackage("com.whatsapp")
+        startActivity(sendIntent)
+    }
+
+    private fun scheduleMessage(message: String, phoneNumber: String) {
+        // Implement logic to schedule the message
+        Toast.makeText(this, "Message scheduled for later", Toast.LENGTH_SHORT).show()
     }
 }

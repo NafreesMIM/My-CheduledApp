@@ -1,39 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/messageEditText"
+        android:id="@+id/editTextMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:hint="@string/enter_message_hint"
-        android:inputType="textMultiLine"
-        android:autofillHints="message"/>
+        android:minHeight="48dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
 
-    <Button
-        android:id="@+id/selectDateTimeButton"
+    <EditText
+        android:id="@+id/editTextPhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextMessage"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:hint="@string/Phone_num"
+        android:inputType="phone"
+        android:minHeight="48dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+
+    <!-- Date and time picker -->
+    <!-- Text box for selecting date and time -->
+    <EditText
+        android:id="@+id/editTextDateTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextPhoneNumber"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:focusable="false"
+        android:hint="@string/select_date_time_button"
+        android:minHeight="48dp"
+        android:onClick="showDateTimePicker"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+
+    <!-- Checkbox for automatic mobile data -->
+    <CheckBox
+        android:id="@+id/checkBoxMobileData"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/messageEditText"
-        android:layout_marginTop="41dp"
-        android:text="@string/select_date_time_button" />
+        android:layout_below="@id/editTextDateTime"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/turn_on_mobile_data" />
 
+    <!-- Buttons for sending -->
     <Button
-        android:id="@+id/scheduleButton"
+        android:id="@+id/buttonSendNow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/selectDateTimeButton"
-        android:layout_marginTop="38dp"
+        android:text="@string/send_now_button"
+        android:layout_below="@id/checkBoxMobileData"
+        android:layout_margin="16dp"/>
+
+    <Button
+        android:id="@+id/buttonSchedule"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/checkBoxMobileData"
+        android:layout_marginStart="43dp"
+        android:layout_marginTop="13dp"
+        android:layout_marginEnd="16dp"
+        android:layout_toEndOf="@id/buttonSendNow"
         android:text="@string/schedule_message_button" />
 
-    <CheckBox
-        android:id="@+id/autoTurnOnDataCheckbox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/scheduleButton"
-        android:layout_marginTop="16dp"
-        android:text="Automatically turn on mobile data"
-        android:checked="false"/>
 </RelativeLayout>
